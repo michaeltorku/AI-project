@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import $ from 'jquery';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
-
+import jsonData from './data/results.json';
 let loanVal;
 let occupationVal;
 let paymentVal;
@@ -75,7 +75,7 @@ const initialFormData = {
 };
 
 function Frontend(props) {
-  const [item1, setItem1] = useState('');
+  const [submitted, setSubmit] = useState(false);
   const [item2, setItem2] = useState('');
   const [item3, setItem3] = useState('');
   const [item4, setItem4] = useState('');
@@ -90,6 +90,7 @@ function Frontend(props) {
     const json = JSON.stringify(formData);
     const blob = new Blob([json], { type: 'application/json' });
     saveAs(blob, 'data.json');
+    setSubmit(true);
   };
 
   const handleInputChange = (event) => {
@@ -219,8 +220,73 @@ function Frontend(props) {
     }));
   };
 
+  let text;
+
+  // const [jsonData, setJsonData] = useState(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get('../data/results.json');
+  //       setJsonData(response.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  // const parsedData = JSON.parse(jsonData);
+
+  const score = jsonData['credit_score'];
+  const improvements = jsonData['improvements'];
+  if (score == 2) {
+    text = 'You have a good credit score. ' + improvements;
+  } else if (score == 1) {
+    text = 'You have an average credit score. ' + improvements;
+  } else {
+    text = 'You have a bad credit score. ' + improvements;
+  }
   console.log(props);
-  return (
+  return submitted ? (
+    <div
+      style={{
+        backgroundImage: `url(${props.background})`,
+        height: '100vh',
+        width: '100vw',
+        fontSize: '50px',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'white',
+          boxShadow: '-1px 2px 4px 0px',
+          position: 'relative',
+          height: 'auto',
+          width: '400px',
+          borderRadius: '25px',
+          padding: '20px 20px 20px 20px',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <form
+          onSubmit={() => {
+            setSubmit(true);
+          }}
+          style={{ display: 'grid', fontSize: '30px' }}
+        >
+          <div>
+            <div>{text}</div>
+            <input type='submit' value='Reuse Model' />
+          </div>
+        </form>
+      </div>
+    </div>
+  ) : (
     <div
       style={{
         backgroundImage: `url(${props.background})`,
